@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+    <div id="test-text" style="font-family: 'TestingFont', sans-serif; font-size: 40px;">
+        这是一段测试中文字体是否被成功加载的文本。
+    </div>
+    <script>
+        async function test() {
+            try {
+                const resp = await fetch('http://mindmappro.local/fonts/msyh.ttc');
+                let buffer = await resp.arrayBuffer();
+                
+                const dataView = new DataView(buffer);
+                const tag = String.fromCharCode(dataView.getUint8(0), dataView.getUint8(1), dataView.getUint8(2), dataView.getUint8(3));
+                if (tag === 'ttcf') {
+                    const offset0 = dataView.getUint32(12, false); 
+                    const numTables = dataView.getUint16(offset0 + 4, false); 
+                    const headerSize = 12 + numTables * 16;
+                    const srcView = new Uint8Array(buffer, offset0, headerSize);
+                    const destView = new Uint8Array(buffer, 0, headerSize);
+                    destView.set(srcView); 
+                    console.log('TTC Header Patched!');
+                }
+
+                const blob = new Blob([buffer], { type: 'font/ttf' });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const style = document.createElement('style');
+                style.textContent = `@font-face { font-family: 'TestingFont'; src: url('${blobUrl}') format('truetype'); }`;
+                document.head.appendChild(style);
+                console.log('Style injected');
+            } catch(e) {
+                console.error(e);
+            }
+        }
+        test();
+    </script>
+</body>
+</html>

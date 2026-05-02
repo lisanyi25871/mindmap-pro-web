@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>思维导图 - 移动版</title>
+    <script src="./lib/tailwindcss.js"></script>
+    <script src="./lib/d3.js"></script>
+    <script src="./lib/markmap-lib.js"></script>
+    <script src="./lib/markmap-view.js"></script>
+    <link rel="stylesheet" href="./mobile.css">
+    <script src="./fonts/config.js"></script>
+    <script>
+        const originalWarn = console.warn;
+        console.warn = (...args) => { if (args[0] && args[0].includes('cdn.tailwindcss.com')) return; originalWarn(...args); };
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen w-screen flex flex-col overflow-hidden font-sans relative">
+
+    <header class="bg-white border-b border-slate-200 h-14 flex items-center justify-between px-4 shrink-0 shadow-sm z-20">
+        <button id="btn-toggle-editor" class="flex items-center gap-1 px-3 py-1.5 text-sm font-bold text-blue-600 bg-blue-50 active:bg-blue-100 rounded-md transition">
+            📝 数据
+        </button>
+        <h1 class="text-lg font-bold text-slate-800 tracking-tight">Mindmap Pro</h1>
+        <button id="btn-export-menu" class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 active:bg-blue-700 rounded-md transition shadow-md">
+            ⬇️ 导出
+        </button>
+    </header>
+
+    <main class="flex-1 relative w-full h-full">
+        <div id="export-zone" class="markmap-container w-full h-full">
+            <svg id="markmap" class="w-full h-full"></svg>
+        </div>
+
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-slate-200 p-1 z-40 whitespace-nowrap">
+            <button id="btn-settings" class="p-2 text-slate-500 hover:text-blue-600 active:bg-slate-100 rounded-full transition flex items-center justify-center">
+                <span class="font-serif font-bold text-[15px] leading-none px-1">Aa</span>
+            </button>
+            <div class="w-px h-5 bg-slate-200 mx-1"></div>
+            <button id="btn-undo" class="p-2 text-slate-500 hover:text-blue-600 active:bg-slate-100 rounded-full transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+            </button>
+            <div class="w-px h-5 bg-slate-200 mx-1"></div>
+            <button id="btn-zoom-in" class="p-2 text-slate-500 hover:text-blue-600 active:bg-slate-100 rounded-full transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+            </button>
+            <button id="btn-zoom-out" class="p-2 text-slate-500 hover:text-blue-600 active:bg-slate-100 rounded-full transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg>
+            </button>
+            <button id="btn-fit" class="p-2 text-slate-500 hover:text-blue-600 active:bg-slate-100 rounded-full transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+            </button>
+            <div class="w-px h-5 bg-slate-200 mx-1"></div>
+            <button id="btn-help" class="p-2 text-slate-500 hover:text-blue-600 active:bg-slate-100 rounded-full transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+        </div>
+    </main>
+
+    <div id="mobile-editor-drawer" class="flex flex-col">
+        <div class="flex items-center justify-between px-4 h-12 bg-slate-800/80 border-b border-slate-700 shrink-0">
+            <span class="text-slate-300 text-sm font-medium">Markdown 结构编辑</span>
+            <button id="btn-close-editor" class="text-slate-400 hover:text-white p-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <textarea id="editor" class="flex-1 w-full p-4 bg-transparent text-slate-300 font-mono text-[15px] leading-relaxed resize-none outline-none focus:ring-0" spellcheck="false"></textarea>
+    </div>
+
+    <div id="mobile-overlay"></div>
+
+    <div id="mobile-action-sheet">
+        <div class="p-5">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-5"></div>
+            <h3 id="node-title" class="text-center text-slate-800 font-bold mb-5 px-4 truncate text-lg">当前节点</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <button id="btn-edit" class="py-3.5 bg-blue-50 text-blue-600 font-bold rounded-xl active:bg-blue-100">✎ 修改文字</button>
+                <button id="btn-add-child" class="py-3.5 bg-slate-50 text-slate-700 font-bold rounded-xl active:bg-slate-100">✨ 添加次级</button>
+                <button id="btn-add-sibling" class="py-3.5 bg-slate-50 text-slate-700 font-bold rounded-xl active:bg-slate-100">➕ 添加同级</button>
+                <button id="btn-delete" class="py-3.5 bg-red-50 text-red-600 font-bold rounded-xl active:bg-red-100">🗑 删除节点</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-settings-sheet">
+        <div class="p-5">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-5"></div>
+            <h3 class="text-center text-slate-800 font-bold mb-5 text-lg">外观配置</h3>
+            <div class="mb-5">
+                <label class="block text-sm font-semibold text-slate-500 mb-2">全局字体</label>
+                <select id="config-font-family" class="w-full text-base text-slate-700 bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+                    <option value='"PingFang SC", "Microsoft YaHei", sans-serif'>默认无衬线 (Sans)</option>
+                    <option value='"Noto Serif SC", "SimSun", serif'>宋体/衬线 (Serif)</option>
+                    <option value='"KaiTi", "Kaiti SC", serif'>优雅楷体 (KaiTi)</option>
+                    <option value='Consolas, monospace'>极客等宽 (Mono)</option>
+                </select>
+            </div>
+            <div class="mb-5">
+                <label class="block text-sm font-semibold text-slate-500 mb-2">基础字号: <span id="config-font-size-val" class="text-blue-600 font-bold">15px</span></label>
+                <input type="range" id="config-font-size" min="12" max="24" step="1" value="15" class="w-full">
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-export-sheet">
+        <div class="p-5">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-5"></div>
+            <h3 class="text-center text-slate-800 font-bold mb-5 text-lg">导出导图</h3>
+            <div class="flex flex-col gap-3">
+                <button id="btn-export-svg" class="py-3.5 bg-blue-50 text-blue-600 font-bold rounded-xl active:bg-blue-100">✨ 导出 SVG 矢量图</button>
+                <button id="btn-export-png" class="py-3.5 bg-blue-50 text-blue-600 font-bold rounded-xl active:bg-blue-100">📸 导出 PNG 高清图</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="prompt-modal" class="hidden fixed inset-0 bg-slate-900/60 z-[200] flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-[90%]">
+            <h3 id="prompt-title" class="text-lg font-bold text-slate-800 mb-4">编辑</h3>
+            <input type="text" id="prompt-input" class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 mb-5 text-[16px]">
+            <div class="flex justify-end gap-3">
+                <button id="prompt-cancel" class="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 active:bg-slate-200 rounded-xl">取消</button>
+                <button id="prompt-confirm" class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 active:bg-blue-700 rounded-xl">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./main.js" defer></script>
+    <script src="./mobile.js" defer></script>
+</body>
+</html>

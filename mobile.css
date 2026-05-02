@@ -1,0 +1,70 @@
+/* 移动端专属样式 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+.markmap-container svg text,
+.markmap-container svg foreignObject { 
+    cursor: pointer; 
+    transition: all 0.2s; 
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.selected-node text, .selected-node foreignObject { 
+    fill: #2563eb !important; 
+    color: #2563eb !important; 
+    font-weight: 800 !important; 
+    text-shadow: 0px 0px 8px rgba(37, 99, 235, 0.4); 
+}
+
+.markmap-container svg path.markmap-link { fill: none !important; }
+
+/* 底部抽屉式编辑器面板 */
+#mobile-editor-drawer {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 60vh; z-index: 1000;
+    background: #0f172a; border-top-left-radius: 16px; border-top-right-radius: 16px;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 🚀 修复黑边：往下多藏 30px，把扩散的阴影彻底埋到屏幕外 */
+    transform: translateY(calc(100% + 30px)); 
+}
+#mobile-editor-drawer.open { transform: translateY(0); }
+
+/* 通用底部操作面板 (Action Sheets) */
+#mobile-action-sheet,
+#mobile-settings-sheet,
+#mobile-export-sheet {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
+    background: white; border-top-left-radius: 24px; border-top-right-radius: 24px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1); padding-bottom: max(20px, env(safe-area-inset-bottom));
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 🚀 修复黑边：往下多藏 50px */
+    transform: translateY(calc(100% + 50px)); 
+}
+#mobile-action-sheet.open,
+#mobile-settings-sheet.open,
+#mobile-export-sheet.open { transform: translateY(0); }
+
+/* 背景蒙版 */
+#mobile-overlay {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 140;
+    backdrop-filter: blur(2px); transition: opacity 0.3s; opacity: 0; pointer-events: none;
+}
+#mobile-overlay.open { opacity: 1; pointer-events: auto; }
+
+/* =========================================
+   🚀 终极修复：移动端高度与安全区适配
+========================================= */
+/* 彻底解决浏览器工具栏遮挡 Bug */
+body {
+    height: 100dvh !important; /* 现代浏览器的动态视口高度 */
+    height: -webkit-fill-available; /* 兼容老版本 iOS */
+}
+
+/* 居中 Dock 栏专属适配：规避底部小白条 */
+.mobile-dock {
+    position: fixed !important;
+    /* 基础 24px + 底部安全区距离 */
+    bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+}

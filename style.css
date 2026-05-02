@@ -1,0 +1,124 @@
+/* =========================================
+   全局滚动条与基础设定
+========================================= */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* =========================================
+   SVG 节点发光高亮与隐身魔法 
+========================================= */
+.markmap-container svg text,
+.markmap-container svg foreignObject { 
+    cursor: pointer; 
+    transition: all 0.2s; 
+}
+
+.selected-node text, .selected-node foreignObject { 
+    fill: #2563eb !important; color: #2563eb !important; 
+    font-weight: 800 !important; 
+    text-shadow: 0px 0px 8px rgba(37, 99, 235, 0.4);
+}
+
+.editing-node text, .editing-node foreignObject {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+.markmap-container svg path.markmap-link { fill: none !important; }
+
+/* =========================================
+   沉浸式原位输入框 
+========================================= */
+#floating-input {
+    position: fixed; 
+    display: none; z-index: 100;
+    padding: 0; margin: 0;
+    background: transparent; color: #2563eb;
+    border: none; outline: none; box-shadow: none;
+    font-weight: 800; 
+    border-bottom: 2px solid #2563eb; 
+}
+
+/* =========================================
+   节点末端半环绕菜单
+========================================= */
+#node-toolbar {
+    position: fixed; 
+    display: none; z-index: 90;
+    width: 0; height: 0; 
+}
+
+.radial-item { position: absolute; width: 36px; height: 36px; transform-origin: center; }
+
+.item-1 { transform: translate(15px, -45px); } 
+.item-2 { transform: translate(45px, -15px); } 
+.item-3 { transform: translate(45px, 15px); }  
+.item-4 { transform: translate(15px, 45px); }  
+
+.menu-left .item-1 { transform: translate(-51px, -45px); } 
+.menu-left .item-2 { transform: translate(-81px, -15px); } 
+.menu-left .item-3 { transform: translate(-81px, 15px); }  
+.menu-left .item-4 { transform: translate(-51px, 45px); } 
+
+.radial-btn {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: white; border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 10px -2px rgba(0,0,0,0.15);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-size: 14px; color: #475569;
+}
+
+.radial-btn:hover { 
+    background: #f8fafc; color: #2563eb; transform: scale(1.15); 
+    box-shadow: 0 6px 12px -2px rgba(37,99,235,0.25); 
+}
+.radial-btn.danger:hover { color: #dc2626; box-shadow: 0 6px 12px -2px rgba(220,38,38,0.25); }
+
+/* =========================================
+   IDE 风格代码编辑器专属美化
+========================================= */
+#editor::selection { background: #3b82f6; color: white; }
+.custom-editor-scrollbar::-webkit-scrollbar { width: 14px; }
+.custom-editor-scrollbar::-webkit-scrollbar-track { background: #0f172a; } 
+.custom-editor-scrollbar::-webkit-scrollbar-thumb { 
+    background: #334155; border: 4px solid #0f172a; border-radius: 8px; 
+}
+.custom-editor-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* =========================================
+   🚀 核心优化：移动端与桌面端双模响应式布局
+========================================= */
+#editor-container {
+    border-color: #1e293b; 
+}
+
+/* 桌面端 (宽屏以上)：左右布局，向左折叠宽度 */
+@media (min-width: 768px) {
+    #editor-container {
+        width: 400px;
+        height: 100%;
+        border-right-width: 1px;
+        border-bottom-width: 0;
+    }
+    #editor-container.collapsed {
+        width: 0 !important;
+        border-right-width: 0;
+    }
+}
+
+/* 移动端 (手机/竖屏平板)：上下布局，向上折叠高度 */
+@media (max-width: 767px) {
+    #editor-container {
+        width: 100%;
+        height: 40vh; /* 移动端编辑器占屏幕40%高度 */
+        border-bottom-width: 1px;
+        border-right-width: 0;
+    }
+    #editor-container.collapsed {
+        height: 0 !important;
+        border-bottom-width: 0;
+    }
+}
